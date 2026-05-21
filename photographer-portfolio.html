@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Erik Larsen — Fotografi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Outfit:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f3ef;
+      --ink: #1a1816;
+      --ink-muted: #7a7570;
+      --accent: #c8a96e;
+      --white: #fdfcfa;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 28px 60px;
+      background: transparent;
+      mix-blend-mode: normal;
+      transition: background 0.4s, padding 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(245,243,239,0.92);
+      backdrop-filter: blur(12px);
+      padding: 18px 60px;
+      border-bottom: 1px solid rgba(26,24,22,0.08);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+
+    /* ── HERO ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 100vh;
+      min-height: 600px;
+      overflow: hidden;
+    }
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 60px 80px;
+      background: var(--bg);
+      position: relative;
+      z-index: 2;
+    }
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 6vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      color: var(--ink);
+      margin-bottom: 32px;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--ink-muted);
+    }
+    .hero-sub {
+      font-size: 0.88rem;
+      line-height: 1.8;
+      color: var(--ink-muted);
+      max-width: 340px;
+      margin-bottom: 48px;
+    }
+    .btn-primary {
+      display: inline-block;
+      padding: 14px 36px;
+      background: var(--ink);
+      color: var(--white);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.25s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+      background: #1a1816;
+    }
+    .hero-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      filter: grayscale(15%);
+      transform: scale(1.04);
+      transition: transform 8s ease;
+      display: block;
+    }
+    .hero-right:hover .hero-img { transform: scale(1); }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(245,243,239,0.15) 0%, transparent 60%);
+    }
+    .hero-counter {
+      position: absolute;
+      bottom: 32px; right: 32px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.18);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 60px;
+      margin: 80px 0 48px;
+    }
+    .divider-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(26,24,22,0.12);
+    }
+
+    /* ── GALLERY ── */
+    #galleri { padding-bottom: 100px; }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: auto;
+      gap: 12px;
+      padding: 0 60px;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+    }
+    .gallery-item:nth-child(1) { grid-column: 1 / 6; grid-row: 1; aspect-ratio: 4/5; }
+    .gallery-item:nth-child(2) { grid-column: 6 / 9; grid-row: 1; aspect-ratio: 3/4; }
+    .gallery-item:nth-child(3) { grid-column: 9 / 13; grid-row: 1; aspect-ratio: 4/5; }
+    .gallery-item:nth-child(4) { grid-column: 1 / 5; grid-row: 2; aspect-ratio: 4/3; }
+    .gallery-item:nth-child(5) { grid-column: 5 / 10; grid-row: 2; aspect-ratio: 16/9; }
+    .gallery-item:nth-child(6) { grid-column: 10 / 13; grid-row: 2; aspect-ratio: 3/4; }
+
+    .gallery-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: grayscale(15%);
+      transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.4s;
+    }
+    .gallery-item:hover img { transform: scale(1.05); filter: grayscale(0%); }
+
+    .gallery-item-overlay {
+      position: absolute; inset: 0;
+      background: rgba(26,24,22,0);
+      display: flex;
+      align-items: flex-end;
+      padding: 20px;
+      transition: background 0.3s;
+    }
+    .gallery-item:hover .gallery-item-overlay { background: rgba(26,24,22,0.3); }
+    .gallery-item-info {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.3s, transform 0.3s;
+      color: var(--white);
+    }
+    .gallery-item:hover .gallery-item-info { opacity: 1; transform: translateY(0); }
+    .gallery-item-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 300;
+    }
+    .gallery-item-price {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+    }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+      display: none;
+      position: fixed; inset: 0;
+      z-index: 999;
+      background: rgba(20,18,16,0.95);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 24px;
+      padding: 40px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 80vw;
+      max-height: 75vh;
+      object-fit: contain;
+    }
+    .lightbox-footer {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+    .lightbox-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: var(--white);
+      font-style: italic;
+    }
+    .lightbox-price {
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+    .btn-buy {
+      padding: 12px 32px;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-buy:hover { background: var(--accent); color: var(--white); }
+    .lightbox-close {
+      position: absolute;
+      top: 32px; right: 40px;
+      background: none; border: none;
+      color: var(--white); font-size: 2rem;
+      cursor: pointer; opacity: 0.6;
+      transition: opacity 0.2s;
+      font-weight: 300;
+      line-height: 1;
+    }
+    .lightbox-close:hover { opacity: 1; }
+
+    /* ── OM MEG ── */
+    #om-meg {
+      background: var(--ink);
+      color: var(--white);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 75vh;
+    }
+    .about-img-wrap {
+      overflow: hidden;
+      position: relative;
+    }
+    .about-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.7;
+      filter: grayscale(30%);
+    }
+    .about-content {
+      padding: 100px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .about-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .about-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 300;
+      line-height: 1.15;
+      margin-bottom: 32px;
+    }
+    .about-title em { font-style: italic; opacity: 0.6; }
+    .about-text {
+      font-size: 0.9rem;
+      line-height: 1.9;
+      color: rgba(255,255,255,0.6);
+      max-width: 420px;
+      margin-bottom: 48px;
+    }
+    .about-contact-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .about-contact-list li { font-size: 0.82rem; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; }
+    .about-contact-list a { color: var(--accent); text-decoration: none; transition: opacity 0.2s; }
+    .about-contact-list a:hover { opacity: 0.7; }
+
+    /* ── KONTAKT ── */
+    #kontakt {
+      padding: 120px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .contact-left {}
+    .contact-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .contact-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 4vw, 4rem);
+      font-weight: 300;
+      line-height: 1.1;
+      margin-bottom: 28px;
+    }
+    .contact-title em { font-style: italic; opacity: 0.45; }
+    .contact-desc {
+      font-size: 0.88rem;
+      line-height: 1.9;
+      color: var(--ink-muted);
+      max-width: 380px;
+    }
+    .contact-form { display: flex; flex-direction: column; gap: 0; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .form-group label {
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+    .form-group input,
+    .form-group textarea {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(26,24,22,0.2);
+      padding: 12px 0;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+      resize: none;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { height: 100px; }
+    .btn-submit {
+      align-self: flex-start;
+      padding: 15px 40px;
+      background: var(--ink);
+      color: var(--white);
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+    .btn-submit:hover { background: var(--accent); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(26,24,22,0.1);
+      padding: 40px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+    .footer-copy { font-size: 0.75rem; color: var(--ink-muted); letter-spacing: 0.08em; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hero-eyebrow { animation: fadeUp 0.8s ease 0.2s both; }
+    .hero-title   { animation: fadeUp 0.8s ease 0.4s both; }
+    .hero-sub     { animation: fadeUp 0.8s ease 0.6s both; }
+    .btn-primary  { animation: fadeUp 0.8s ease 0.8s both; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 24px 28px; }
+      nav.scrolled { padding: 16px 28px; }
+      .nav-links { gap: 20px; }
+      .hero { grid-template-columns: 1fr; height: auto; }
+      .hero-left { padding: 140px 28px 60px; }
+      .hero-right { height: 60vw; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; padding: 0 28px; }
+      .gallery-item { grid-column: auto !important; grid-row: auto !important; aspect-ratio: 3/4 !important; }
+      #om-meg { grid-template-columns: 1fr; }
+      .about-img-wrap { height: 60vw; }
+      .about-content { padding: 60px 28px; }
+      #kontakt { grid-template-columns: 1fr; padding: 80px 28px; gap: 48px; }
+      .section-divider { padding: 0 28px; }
+      footer { padding: 32px 28px; flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">Erik Larsen</a>
+  <ul class="nav-links">
+    <li><a href="#galleri">Galleri</a></li>
+    <li><a href="#om-meg">Om meg</a></li>
+    <li><a href="#kontakt">Kontakt</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <p class="hero-eyebrow">Kunstnerisk fotografi</p>
+    <h1 class="hero-title">Bilder som<br><em>forteller</em><br>historier</h1>
+    <p class="hero-sub">Hvert motiv er en invitasjon til å se verden på nytt — stille, presist og uten unødvendige ord.</p>
+    <a href="#galleri" class="btn-primary">Se galleri</a>
+  </div>
+  <div class="hero-right">
+    <img class="hero-img"
+      src="https://images.unsplash.com/photo-1554080353-a576cf803bda?w=1200&q=85&auto=format&fit=crop"
+      alt="Portrett av fotograf" />
+    <div class="hero-overlay"></div>
+    <div class="hero-counter">01</div>
+  </div>
+</section>
+
+<!-- GALLERI -->
+<section id="galleri">
+  <div class="section-divider">
+    <span class="divider-label">Galleri</span>
+    <div class="divider-line"></div>
+  </div>
+  <div class="gallery-grid">
+    <div class="gallery-item" onclick="openLightbox(0)">
+      <img src="https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=900&q=85&auto=format&fit=crop" alt="Fjell" />
+      <div class="gallery-item-overlay">
+        <div class="gallery-item-info">
+          <div class="gallery-item-title">Stille topp</div>
+          <div class="gallery-item-price">Fra 1 800 kr</div>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(1)">
+      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=85&auto=format&fit=crop" alt="Fjordlandskap" />
+      <div class="gallery-item-overlay">
+        <div class="gallery-item-info">
+          <div class="gallery-item-title">Morgenlys</div>
+          <div class="gallery-item-price">Fra 1 200 kr</div>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(2)">
+      <img src="https://images.unsplash.com/photo-1520962922320-2038eebab146?w=900&q=85&auto=format&fit=crop" alt="Nordlys" />
+      <div class="gallery-item-overlay">
+        <div class="gallery-item-info">
+          <div class="gallery-item-title">Nordlys</div>
+          <div class="gallery-item-price">Fra 2 200 kr</div>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(3)">
+      <img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=900&q=85&auto=format&fit=crop" alt="Vinter" />
+      <div class="gallery-item-overlay">
+        <div class="gallery-item-info">
+          <div class="gallery-item-title">Vinterro</div>
+          <div class="gallery-item-price">Fra 3 000 kr</div>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(4)">
+      <img src="https://images.unsplash.com/photo-1439853949212-36589f9f6458?w=900&q=85&auto=format&fit=crop" alt="Vann og fjell" />
+      <div class="gallery-item-overlay">
+        <div class="gallery-item-info">
+          <div class="gallery-item-title">Speiling</div>
+          <div class="gallery-item-price">Fra 1 500 kr</div>
+        </div>
+      </div>
+    </div>
+    <div class="gallery-item" onclick="openLightbox(5)">
+      <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=900&q=85&auto=format&fit=crop" alt="Skog" />
+      <div class="gallery-item-overlay">
+        <div class="gallery-item-info">
+          <div class="gallery-item-title">Dyp skog</div>
+          <div class="gallery-item-price">Fra 1 800 kr</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img id="lightbox-img" src="" alt="" />
+  <div class="lightbox-footer">
+    <div>
+      <div class="lightbox-title" id="lightbox-title"></div>
+      <div class="lightbox-price" id="lightbox-price"></div>
+    </div>
+    <a href="#kontakt" class="btn-buy" onclick="closeLightbox()">Kjøp dette bildet</a>
+  </div>
+</div>
+
+<!-- OM MEG -->
+<section id="om-meg">
+  <div class="about-img-wrap">
+    <img class="about-img"
+      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&q=85&auto=format&fit=crop"
+      alt="Fotograf med kamera" />
+  </div>
+  <div class="about-content">
+    <p class="about-eyebrow">Om meg</p>
+    <h2 class="about-title">Jeg fotograferer<br><em>det ingen</em><br>legger merke til</h2>
+    <p class="about-text">
+      Siden 2010 har jeg dokumentert naturen og menneskene rundt meg med et blikk for det stille og oversette. Jeg jobber med analoge og digitale teknikker, og alle bilder er tilgjengelig som håndholdte kunsttrykk i begrenset opplag.
+    </p>
+    <ul class="about-contact-list">
+      <li>📍 Oslo, Norge</li>
+      <li>✉ <a href="mailto:erik@larsen.foto">erik@larsen.foto</a></li>
+      <li>📞 <a href="tel:+4799999999">+47 999 99 999</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- KONTAKT -->
+<section id="kontakt">
+  <div class="contact-left">
+    <p class="contact-eyebrow">Kontakt</p>
+    <h2 class="contact-title">La oss snakke<br><em>om bilder</em></h2>
+    <p class="contact-desc">
+      Interessert i å kjøpe et trykk, eller har du spørsmål om spesialtilpasning og størrelse? Send meg en melding — jeg svarer innen 24 timer.
+    </p>
+  </div>
+  <form class="contact-form" onsubmit="handleSubmit(event)">
+    <div class="form-group">
+      <label>Navn</label>
+      <input type="text" placeholder="Ditt navn" />
+    </div>
+    <div class="form-group">
+      <label>E-post</label>
+      <input type="email" placeholder="din@epost.no" />
+    </div>
+    <div class="form-group">
+      <label>Melding</label>
+      <textarea placeholder="Fortell meg hva du er interessert i..."></textarea>
+    </div>
+    <button type="submit" class="btn-submit">Send melding</button>
+  </form>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Erik Larsen</div>
+  <div class="footer-copy">© 2026 — Alle bilder er opphavsrettslig beskyttet</div>
+</footer>
+
+<script>
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Lightbox data
+  const images = [
+    { src: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600&q=90&auto=format&fit=crop', title: 'Stille topp', price: 'Fra 1 800 kr' },
+    { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=90&auto=format&fit=crop', title: 'Morgenlys', price: 'Fra 1 200 kr' },
+    { src: 'https://images.unsplash.com/photo-1520962922320-2038eebab146?w=1600&q=90&auto=format&fit=crop', title: 'Nordlys', price: 'Fra 2 200 kr' },
+    { src: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=1600&q=90&auto=format&fit=crop', title: 'Vinterro', price: 'Fra 3 000 kr' },
+    { src: 'https://images.unsplash.com/photo-1439853949212-36589f9f6458?w=1600&q=90&auto=format&fit=crop', title: 'Speiling', price: 'Fra 1 500 kr' },
+    { src: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=90&auto=format&fit=crop', title: 'Dyp skog', price: 'Fra 1 800 kr' },
+  ];
+
+  function openLightbox(i) {
+    const lb = document.getElementById('lightbox');
+    document.getElementById('lightbox-img').src = images[i].src;
+    document.getElementById('lightbox-title').textContent = images[i].title;
+    document.getElementById('lightbox-price').textContent = images[i].price;
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('.btn-submit');
+    btn.textContent = 'Sendt ✓';
+    btn.style.background = '#c8a96e';
+    setTimeout(() => { btn.textContent = 'Send melding'; btn.style.background = ''; }, 3000);
+  }
+</script>
+</body>
+</html>
